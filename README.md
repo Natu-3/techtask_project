@@ -3,7 +3,9 @@ PHP Laravel을 이용한 간단한 인증 게시판
 
 ## 요구사항
 1. 로그인 페이지 구현 (DB 테이블에 사전 회원정보 존재하는 상황 가정) 
-회원가입 및 암호화 패턴 생각하지 않고 로그인을 통한 인증 로직까지만 구현 
+회원가입 및 *암호화 패턴* 생각하지 않고 로그인을 통한 인증 로직까지만 구현  
+    1-1 *암호화 패턴을 초기값에서 지정가능함* 0307 23:44
+
 2. 로그인 완료 후 이용 가능한 게시판 기능 구현
 로그인 후 인가받아 게시판 접근가능 -> 게시판 목록, 게시판 폼
 게시글의 CRUD API 작성해보기
@@ -38,6 +40,12 @@ content     TEXT            /   not_null
 user_id     FK(users_id)    /   not_null (fk)
 created_at  TIMESTAMP       /   nullable
 updated_at  TIMESTAMP       /   nullable
+
+E-R  1:N (user - posts)
+
+
+
+
 
 
 ## GUIDE
