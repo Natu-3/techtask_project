@@ -24,3 +24,17 @@ ERD 및 각 칼럼 정보
 
 ## GUIDE
 필요시 점진적 추가
+
+### 로컬 개발서버 빌드 가이드
+```
+git clone https://github.com/Natu-3/techtask_project.git
+cd laravel-crud-app
+composer install
+npm install
+copy .env.example .env
+php artisan key:generate
+type nul > database\database.sqlite
+php artisan migrate
+npm run dev
+php artisan serve 
+```
