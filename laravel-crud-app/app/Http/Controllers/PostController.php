@@ -145,7 +145,7 @@ class PostController extends Controller
         }
 
         # 이미지 파일 삭제처리
-        $post>load('images'); # 이미지 정보에서 로드
+        $post -> load('images'); # 이미지 정보에서 로드
 
         foreach ($post->images as $image) {
         Storage::disk('public')->delete($image->path);

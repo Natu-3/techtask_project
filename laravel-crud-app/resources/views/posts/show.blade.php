@@ -33,7 +33,7 @@
         <div style="display: flex; gap: 10px;">
             @foreach ($post->images as $image)
                 <div>
-                    <img src="{{ asset('storage/' . $image->image_path) }}"
+                    <img src="{{ asset('storage/' . $image->path) }}"
                     alt="{{ $image->original_name }}"
                     style="max-width: 200px; height: auto;">
                 </div>
