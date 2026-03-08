@@ -27,6 +27,19 @@
         {!! nl2br(e($post->content)) !!} <!-- nl2br : 줄바꿈 <br>로 변환해서 화면에 보임 , e(): html 이스케이프: 새로운 태그 삽입 공격 방지 -->
     </div>
 
+    @if ($post-> images -> isNotEmpty())
+        <hr>
+        <h3>첨부 이미지</h3>
+        <div style="display: flex; gap: 10px;">
+            @foreach ($post->images as $image)
+                <div>
+                    <img src="{{ asset('storage/' . $image->image_path) }}"
+                    alt="{{ $image->original_name }}"
+                    style="max-width: 200px; height: auto;">
+                </div>
+            @endforeach
+        </div>
+    @endif
     <hr>
 
     <p>

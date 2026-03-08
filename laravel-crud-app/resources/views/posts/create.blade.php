@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('posts.store') }}">
+    <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div>
@@ -28,6 +28,13 @@
         <div>
             <label for="content">내용</label><br>
             <textarea name="content" id="content" rows="10" cols="50" required>{{ old('content') }}</textarea>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="images">이미지 upload</label><br>
+            <input type="file" name="images[]" id="images" multiple accept="image/*">
         </div>
 
         <br>
