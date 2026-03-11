@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', '게시글 목록')
+@section('page_title', '게시글 목록')
 
 @section('content')
     <h2>게시글 목록</h2>
