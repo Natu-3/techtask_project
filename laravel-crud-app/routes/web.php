@@ -13,6 +13,11 @@ Route::get('/', function () {
     return redirect()->route('posts.index');
 });
 
+Route::get('/adminlte-test', function () {
+    return view('test-adminlte');
+});
+
+
 Route::middleware('guest')->group(function () { #guest 미들웨어? 로그인 하지 않은 사용자임, 역으로 로그인 한 사용자가 접근불가
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login'); #로그인 폼 접근 가능
     Route::post('/login', [LoginController::class, 'login'])->name('login.submit'); #로그인 폼 제출 가능
