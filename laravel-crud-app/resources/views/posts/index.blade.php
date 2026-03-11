@@ -68,12 +68,10 @@
             </table>
         </div>
 
-        @if (method_exists($posts, 'links'))
-            <div class="card-footer clearfix">
-                <div class="float-end">
-                    {{ $posts->links() }}
-                </div>
+        <div class="card-footer clearfix">
+            <div class="float-end">
+                {{ $posts->links() }}
             </div>
-        @endif
+        </div>
     </div>
 @endsection

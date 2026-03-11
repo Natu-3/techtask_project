@@ -18,8 +18,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')->latest()->get(); # user정보와 같이, 최신순으로, 가져온다
-
+        $posts = Post::with('user')->latest()    //get(); # user정보와 같이, 최신순으로, 가져온다
+        ->paginate(5);
         return view('posts.index', compact('posts')); #posts 에 담아 posts.index 뷰로 전달한다
     }
 
@@ -158,4 +158,6 @@ class PostController extends Controller
             ->with('success', '게시글이 삭제되었습니다.');
 
     }
+
+
 }
