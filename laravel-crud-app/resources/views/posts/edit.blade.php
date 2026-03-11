@@ -64,29 +64,102 @@
 @extends('layouts.admin')
 
 @section('title', '게시글 수정')
+@section('page_title', '게시글 수정')
 
 @section('content')
-    <h2>게시글 수정</h2>
-
-    <form action="{{ route('posts.update', $post) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div>
-            <label for="title">제목</label>
-            <input type="text" name="title" id="title" value="{{ old('title', $post->title) }}">
+    <div class="card card-warning">
+        <div class="card-header">
+            <h3 class="card-title">게시글 수정</h3>
         </div>
 
-        <div>
-            <label for="content">내용</label>
-            <textarea name="content" id="content" rows="5">{{ old('content', $post->content) }}</textarea>
-        </div>
+        <form action="{{ route('posts.update', $post) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-        <div>
-            <label for="images">이미지 추가</label>
-            <input type="file" name="images[]" id="images" multiple>
-        </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="title">제목</label>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        class="form-control @error('title') is-invalid @enderror"
+                        value="{{ old('title', $post->title) }}"
+                        placeholder="제목을 입력하세요"
+                    >
+                    @error('title')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                </div>
 
-        <button type="submit">수정</button>
-    </form>
+                <div class="form-group mb-3">
+                    <label for="content">내용</label>
+                    <textarea
+                        name="content"
+                        id="content"
+                        rows="6"
+                        class="form-control @error('content') is-invalid @enderror"
+                        placeholder="내용을 입력하세요"
+                    >{{ old('content', $post->content) }}</textarea>
+                    @error('content')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="images">이미지 추가</label>
+                    <input
+                        type="file"
+                        name="images[]"
+                        id="images"
+                        class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror"
+                        multiple
+                    >
+                    @error('images')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                    @error('images.*')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                    <small class="form-text text-muted">
+                        새 이미지를 추가로 업로드할 수 있습니다.
+                    </small>
+                </div>
+
+                @if ($post->images && $post->images->count())
+                    <div class="form-group mb-3">
+                        <label>기존 이미지</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach ($post->images as $image)
+                                <div class="border rounded p-2 text-center">
+                                    <img
+                                        src="{{ asset('storage/' . $image->path) }}"
+                                        alt="post image"
+                                        style="width: 120px; height: 120px; object-fit: cover;"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ route('posts.show', $post) }}" class="btn btn-secondary">
+                    취소
+                </a>
+                <button type="submit" class="btn btn-warning">
+                    수정 완료
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection

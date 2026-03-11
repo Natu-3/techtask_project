@@ -1,80 +1,84 @@
-{{--<!DOCTYPE html>--}}
-{{--<html lang="ko">--}}
-{{--<head>--}}
-{{--    <meta charset="UTF-8">--}}
-{{--    <title>새 글 작성</title>--}}
-{{--</head>--}}
-{{--<body>--}}
-{{--    <h1>새 글 작성</h1>--}}
-
-{{--    @if ($errors->any())--}}
-{{--        <div style="color: red;">--}}
-{{--            @foreach ($errors->all() as $error)--}}
-{{--                <p>{{ $error }}</p>--}}
-{{--            @endforeach--}}
-{{--        </div>--}}
-{{--    @endif--}}
-
-{{--    <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">--}}
-{{--        @csrf--}}
-
-{{--        <div>--}}
-{{--            <label for="title">제목</label><br>--}}
-{{--            <input type="text" name="title" id="title" value="{{ old('title') }}" required>--}}
-{{--        </div>--}}
-
-{{--        <br>--}}
-
-{{--        <div>--}}
-{{--            <label for="content">내용</label><br>--}}
-{{--            <textarea name="content" id="content" rows="10" cols="50" required>{{ old('content') }}</textarea>--}}
-{{--        </div>--}}
-
-{{--        <br>--}}
-
-{{--        <div>--}}
-{{--            <label for="images">이미지 upload</label><br>--}}
-{{--            <input type="file" name="images[]" id="images" multiple accept="image/*">--}}
-{{--        </div>--}}
-
-{{--        <br>--}}
-
-{{--        <button type="submit">등록</button>--}}
-{{--    </form>--}}
-
-{{--    <br>--}}
-
-{{--    <p>--}}
-{{--        <a href="{{ route('posts.index') }}">목록으로 돌아가기</a>--}}
-{{--    </p>--}}
-{{--</body>--}}
-{{--</html>--}}
 @extends('layouts.admin')
 
 @section('title', '게시글 작성')
+@section('page_title', '게시글 작성')
 
 @section('content')
-    <h2>게시글 작성</h2>
-
-    <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div>
-            <label for="title">제목</label>
-            <input type="text" name="title" id="title" value="{{ old('title') }}">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">새 게시글 작성</h3>
         </div>
 
-        <div>
-            <label for="content">내용</label>
-            <textarea name="content" id="content" rows="5">{{ old('content') }}</textarea>
-        </div>
+        <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-        <div>
-            <label for="images">이미지</label>
-            <input type="file" name="images[]" id="images" multiple>
-        </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="title">제목</label>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        class="form-control @error('title') is-invalid @enderror"
+                        value="{{ old('title') }}"
+                        placeholder="제목을 입력하세요"
+                    >
+                    @error('title')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                </div>
 
-        <button type="submit">저장</button>
-    </form>
+                <div class="form-group mb-3">
+                    <label for="content">내용</label>
+                    <textarea
+                        name="content"
+                        id="content"
+                        rows="6"
+                        class="form-control @error('content') is-invalid @enderror"
+                        placeholder="내용을 입력하세요"
+                    >{{ old('content') }}</textarea>
+                    @error('content')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="images">이미지 업로드</label>
+                    <input
+                        type="file"
+                        name="images[]"
+                        id="images"
+                        class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror"
+                        multiple
+                    >
+                    @error('images')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                    @error('images.*')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                    <small class="form-text text-muted">
+                        여러 이미지를 선택할 수 있습니다.
+                    </small>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ route('posts.index') }}" class="btn btn-secondary">
+                    목록
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    저장
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection
-
