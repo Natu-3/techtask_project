@@ -95,24 +95,10 @@
 
     {{-- Main Content --}}
     <main class="app-main">
-        <div class="app-content-header">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <h3 class="mb-0">@yield('page_title', 'Dashboard')</h3>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('posts.index') }}">Home</a>
-                            </li>
-                            <li class="breadcrumb-item active">@yield('page_title', 'Dashboard')</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        @include('partials.page-header', [
+        'title' => trim($__env->yieldContent('page_title')) ?: 'Dashboard',
+        'action' => trim($__env->yieldContent('page_action'))
+    ])
         <div class="app-content">
             <div class="container-fluid">
                 @include('partials.alerts')
