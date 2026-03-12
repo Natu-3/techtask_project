@@ -18,3 +18,4 @@ Prepared Statements
 
 
 timestamp 실제시간과 다르게 찍힘
+-timezone 이슈, 실제 시간과 다르게
