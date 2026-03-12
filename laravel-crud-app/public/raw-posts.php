@@ -1,8 +1,13 @@
 <?php
 
+require_once __DIR__ . "/../app/support/logger.php";
+
 $dbPath = __DIR__ . '/../database/database.sqlite';
 
+writeLog("info", 'raw-posts.php Started');
+
 if (!file_exists($dbPath)) {
+    writeLog('error', 'SQLite 파일이 존재하지 않습니다: ' . $dbPath);
     exit('SQLite 파일이 존재하지 않습니다.');
 }
 
@@ -10,11 +15,17 @@ try {
     $pdo = new PDO('sqlite:' . $dbPath);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    //writeLog("info", "DB 연결 성공");
+    writeLog("info", "게시글 목록 조회 시작");
 
     $sql = "SELECT id, title, content, user_id, created_at FROM posts ORDER BY id DESC";
     $stmt = $pdo->query($sql);
     $posts = $stmt->fetchAll();
+
+    writeLog('info', '게시글 목록 조회 성공  total : '. count($posts));
+
 } catch (PDOException $e) {
+    writeLog('게시글 목록 조회 실패 :', $e->getMessage());
     exit('오류 발생: ' . $e->getMessage());
 }
 ?>

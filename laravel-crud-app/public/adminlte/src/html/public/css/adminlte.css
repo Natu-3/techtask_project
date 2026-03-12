@@ -14677,7 +14677,7 @@ html.maximized-card {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: center;
+  justify-content: center
   padding: 0 10px;
   line-height: 1.8;
 }

@@ -2,7 +2,8 @@
 
 function writeLog(string $level, string $message): void
 {
-    $logDir = __DIR__ . '../logs';
+    $projectRoot = dirname(__DIR__, 2);
+    $logDir = $projectRoot . '/logs';
     $logFile = $logDir . '/app.log';
 
     if (!is_dir($logDir)) {
