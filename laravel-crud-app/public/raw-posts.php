@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . "/../app/support/logger.php";
 
 $dbPath = __DIR__ . '/../database/database.sqlite';
@@ -17,11 +16,33 @@ try {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     //writeLog("info", "DB 연결 성공");
     writeLog("info", "게시글 목록 조회 시작");
+    // page 당 게시글 단위수
+    $perPage =5;
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if($currentPage < 1){
+        $currentPage = 1;
+    }
 
-    $sql = "SELECT id, title, content, user_id, created_at FROM posts ORDER BY id DESC";
-    $stmt = $pdo->query($sql);
+    $countSql = "SELECT COUNT(*) FROM posts";
+    $totalCount = $pdo->query($countSql)->fetchColumn();
+    $totalPages = (int) ceil($totalCount / $perPage);
+
+    if($totalPages > 0 && $currentPage > $totalPages){
+        $currentPage = $totalPages;
+    }
+
+    $offset = ($currentPage - 1) * $perPage;
+
+    $sql = "SELECT id, title, content, user_id, created_at
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT :limit OFFSET :offset";
+    $stmt =$pdo->prepare($sql);
+    $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    //$stmt = $pdo->query($sql);
     $posts = $stmt->fetchAll();
-
     writeLog('info', '게시글 목록 조회 성공  total : '. count($posts));
 
 } catch (PDOException $e) {
@@ -95,6 +116,23 @@ try {
         <?php endforeach; ?>
         </tbody>
     </table>
+    <div style="margin-top: 20px;">
+        <?php if ($currentPage > 1): ?>
+            <a href="?page=<?= $currentPage - 1 ?>">이전</a>
+        <?php endif; ?>
+
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <?php if ($i === $currentPage): ?>
+                <strong style="margin: 0 6px;"><?= $i ?></strong>
+            <?php else: ?>
+                <a href="?page=<?= $i ?>" style="margin: 0 6px;"><?= $i ?></a>
+            <?php endif; ?>
+        <?php endfor; ?>
+
+        <?php if ($currentPage < $totalPages): ?>
+            <a href="?page=<?= $currentPage + 1 ?>">다음</a>
+        <?php endif; ?>
+    </div>
 <?php endif; ?>
 </body>
 </html>
