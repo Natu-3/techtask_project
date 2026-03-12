@@ -83,7 +83,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ url('/raw-posts.php') }}" class="nav-link">
                             <i class="nav-icon fas fa-user"></i>
                             <p>추가 메뉴 구현</p>
                         </a>

@@ -67,7 +67,8 @@ try {
     </style>
 </head>
 <body>
-<h1>게시글 목록</h1>
+    <a href="/posts" class="back-button"> Main Menu </a>
+    <h1>게시글 목록</h1>
 
 <?php if (empty($posts)): ?>
     <p class="empty">게시글이 없습니다.</p>
