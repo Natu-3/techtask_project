@@ -25,12 +25,34 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <span class="nav-link">
-                        게시판 시스템
-                    </span>
-                </li>
+            <ul class="navbar-nav ms-auto align-items-center">
+                @auth
+                    <li class="nav-item">
+                        <span class="nav-link">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ Auth::user()->name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-2">
+                                <i class="fas fa-user-circle me-1"></i> 로그아웃
+                            </button>
+                        </form>
+                    </li>
+                @endauth
+
+                {{-- 추후 비로그인 사용자용 로그인 버튼/메뉴 추가 가능 --}}
+                {{--
+                @guest
+                    <li class="nav-item">
+                        <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-sign-in-alt me-1"></i> 로그인
+                        </a>
+                    </li>
+                @endguest
+                --}}
             </ul>
         </div>
     </nav>
@@ -63,7 +85,7 @@
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-user"></i>
-                            <p>내 정보</p>
+                            <p>추가 메뉴 구현</p>
                         </a>
                     </li>
                 </ul>
