@@ -33,10 +33,12 @@ try {
 
     $offset = ($currentPage - 1) * $perPage;
 
-    $sql = "SELECT id, title, content, user_id, created_at
-            FROM posts
-            ORDER BY created_at DESC
-            LIMIT :limit OFFSET :offset";
+    $sql = "SELECT posts.id, posts.title, posts.content, posts.created_at,
+               users.name AS user_name
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        ORDER BY posts.created_at DESC
+        LIMIT :limit OFFSET :offset";
     $stmt =$pdo->prepare($sql);
     $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -99,8 +101,8 @@ try {
         <tr>
             <th>ID</th>
             <th>제목</th>
-            <th>내용</th>
-            <th>작성자 ID</th>
+<!--            <th>내용</th>-->
+            <th>작성자</th>
             <th>작성일</th>
         </tr>
         </thead>
@@ -109,8 +111,7 @@ try {
             <tr>
                 <td><?= htmlspecialchars($post['id']) ?></td>
                 <td><?= htmlspecialchars($post['title']) ?></td>
-                <td><?= nl2br(htmlspecialchars($post['content'])) ?></td>
-                <td><?= htmlspecialchars($post['user_id']) ?></td>
+                <td><?= htmlspecialchars($post['user_name']) ?></td>
                 <td><?= htmlspecialchars($post['created_at']) ?></td>
             </tr>
         <?php endforeach; ?>
