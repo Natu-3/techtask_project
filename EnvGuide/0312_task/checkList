@@ -1,0 +1,20 @@
+@CSRF?
+크로스사이트 요청 위조공격의 명칭, 라라벨에서 이걸 보호하기 위한 취약점 가이드라인 +
+csrf 여부를 미들웨어가 요청 확인할수 있도록 숨겨진 토큰입력 필드 생성
+
+HREF/ROUTE
+href 는 html의 기본 속성 어디로 이동할지를선언
+
+route는 라라벨에서 인식 가능한 php 함수, 그 자리에 넣을 url을 직접 생성하는 것
+
+
+/PDO
+php data object, 말그대로 php 데이터 객체, 다양한 데이터베이스에 php 문서만으로 접근 가능하게 설계되어있음
+
+
+
+Prepared Statements
+
+
+
+timestamp 실제시간과 다르게 찍힘
