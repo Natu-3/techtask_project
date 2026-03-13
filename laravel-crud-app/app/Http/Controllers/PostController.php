@@ -18,15 +18,15 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        #리퀘스트 받은 json 값에서 검색된 키값, 명령어 등
+        #리퀘스트 받은 조건값에서 꺼내 변수에 저장
         $searchType = $request->input('search_type', 'all');
-        $keyword = trim($request->input('keyword', ''));
+        $keyword = trim($request->input('keyword', '')); //앞뒤공백 날림
 
         #post 및 추후 조인할 user 값들 미리 가져오겠다 선언
         $query = Post::with('user')->latest();
 
         if ($keyword !== '') {
-            if ($searchType === 'title') {
+            if ($searchType === 'title') { #검색어가 없을경우 전체 출력(초기 전부 보여주는 index)
                 $query->where('title', 'like', '%' . $keyword . '%');
             } elseif ($searchType === 'writer') {
                 $query->whereHas('user', function ($q) use ($keyword) {
