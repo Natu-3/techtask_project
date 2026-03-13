@@ -14,42 +14,89 @@ try {
     $pdo = new PDO('sqlite:' . $dbPath);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    //writeLog("info", "DB 연결 성공");
+
     writeLog("info", "게시글 목록 조회 시작");
-    // page 당 게시글 단위수
-    $perPage =5;
-    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    if($currentPage < 1){
+
+    $searchType = $_GET['search_type'] ?? 'all';
+    $keyword = trim($_GET['keyword'] ?? '');
+
+    $perPage = 5;
+    $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+    if ($currentPage < 1) {
         $currentPage = 1;
     }
 
-    $countSql = "SELECT COUNT(*) FROM posts";
-    $totalCount = $pdo->query($countSql)->fetchColumn();
+    $whereSql = "";
+    $params = [];
+
+    if ($keyword !== '') {
+        if ($searchType === 'title') {
+            $whereSql = " WHERE posts.title LIKE :keyword ";
+        } elseif ($searchType === 'writer') {
+            $whereSql = " WHERE users.name LIKE :keyword ";
+        } else {
+            $whereSql = " WHERE posts.title LIKE :keyword OR users.name LIKE :keyword ";
+        }
+
+        $params[':keyword'] = '%' . $keyword . '%';
+    }
+
+    // 전체 개수 조회 (검색 반영)
+    $countSql = "
+        SELECT COUNT(*)
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        $whereSql
+    ";
+
+    $countStmt = $pdo->prepare($countSql);
+
+    foreach ($params as $key => $value) {
+        $countStmt->bindValue($key, $value, PDO::PARAM_STR);
+    }
+
+    $countStmt->execute();
+    $totalCount = (int) $countStmt->fetchColumn();
     $totalPages = (int) ceil($totalCount / $perPage);
 
-    if($totalPages > 0 && $currentPage > $totalPages){
+    if ($totalPages > 0 && $currentPage > $totalPages) {
         $currentPage = $totalPages;
     }
 
     $offset = ($currentPage - 1) * $perPage;
 
-    $sql = "SELECT posts.id, posts.title, posts.content, posts.created_at,
-               users.name AS user_name
+    // 게시글 목록 조회
+    $sql = "
+        SELECT
+            posts.id,
+            posts.title,
+            posts.content,
+            posts.created_at,
+            users.name AS user_name
         FROM posts
         JOIN users ON posts.user_id = users.id
+        $whereSql
         ORDER BY posts.created_at DESC
-        LIMIT :limit OFFSET :offset";
-    $stmt =$pdo->prepare($sql);
+        LIMIT :limit OFFSET :offset
+    ";
+
+    $stmt = $pdo->prepare($sql);
+
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value, PDO::PARAM_STR);
+    }
+
     $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
     $stmt->execute();
-    //$stmt = $pdo->query($sql);
     $posts = $stmt->fetchAll();
-    writeLog('info', '게시글 목록 조회 성공  total : '. count($posts));
+
+    writeLog('info', '게시글 목록 조회 성공 total: ' . count($posts));
 
 } catch (PDOException $e) {
-    writeLog('게시글 목록 조회 실패 :', $e->getMessage());
-    exit('오류 발생: ' . $e->getMessage());
+    writeLog('error', '게시글 목록 조회 실패: ' . $e->getMessage());
+    exit('오류 발생: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
 }
 ?>
 <!DOCTYPE html>
@@ -57,6 +104,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>순수 PHP 게시글 목록</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -65,6 +113,20 @@ try {
 
         h1 {
             margin-bottom: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-form input,
+        .search-form select,
+        .search-form button {
+            padding: 8px 10px;
+            font-size: 14px;
         }
 
         table {
@@ -87,11 +149,37 @@ try {
             color: #666;
             padding: 20px 0;
         }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination a,
+        .pagination strong {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
-    <a href="/posts" class="back-button"> Main Menu </a>
-    <h1>게시글 목록</h1>
+<a href="/posts" class="back-button">Main Menu</a>
+<h1>게시글 목록</h1>
+
+<form method="GET" action="raw-posts.php" class="search-form">
+    <select name="search_type">
+        <option value="all" <?= $searchType === 'all' ? 'selected' : '' ?>>전체</option>
+        <option value="title" <?= $searchType === 'title' ? 'selected' : '' ?>>제목</option>
+        <option value="writer" <?= $searchType === 'writer' ? 'selected' : '' ?>>작성자</option>
+    </select>
+
+    <input
+        type="text"
+        name="keyword"
+        value="<?= htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8') ?>"
+        placeholder="검색어를 입력하세요"
+    >
+
+    <button type="submit">검색</button>
+</form>
 
 <?php if (empty($posts)): ?>
     <p class="empty">게시글이 없습니다.</p>
@@ -101,7 +189,6 @@ try {
         <tr>
             <th>ID</th>
             <th>제목</th>
-<!--            <th>내용</th>-->
             <th>작성자</th>
             <th>작성일</th>
         </tr>
@@ -109,29 +196,32 @@ try {
         <tbody>
         <?php foreach ($posts as $post): ?>
             <tr>
-                <td><?= htmlspecialchars($post['id']) ?></td>
-                <td><?= htmlspecialchars($post['title']) ?></td>
-                <td><?= htmlspecialchars($post['user_name']) ?></td>
-                <td><?= htmlspecialchars($post['created_at']) ?></td>
+                <td><?= htmlspecialchars((string) $post['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars($post['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars($post['user_name'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars($post['created_at'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
-    <div style="margin-top: 20px;">
+
+    <div class="pagination">
         <?php if ($currentPage > 1): ?>
-            <a href="?page=<?= $currentPage - 1 ?>">이전</a>
+            <a href="?page=<?= $currentPage - 1 ?>&search_type=<?= urlencode($searchType) ?>&keyword=<?= urlencode($keyword) ?>">이전</a>
         <?php endif; ?>
 
         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
             <?php if ($i === $currentPage): ?>
-                <strong style="margin: 0 6px;"><?= $i ?></strong>
+                <strong><?= $i ?></strong>
             <?php else: ?>
-                <a href="?page=<?= $i ?>" style="margin: 0 6px;"><?= $i ?></a>
+                <a href="?page=<?= $i ?>&search_type=<?= urlencode($searchType) ?>&keyword=<?= urlencode($keyword) ?>">
+                    <?= $i ?>
+                </a>
             <?php endif; ?>
         <?php endfor; ?>
 
         <?php if ($currentPage < $totalPages): ?>
-            <a href="?page=<?= $currentPage + 1 ?>">다음</a>
+            <a href="?page=<?= $currentPage + 1 ?>&search_type=<?= urlencode($searchType) ?>&keyword=<?= urlencode($keyword) ?>">다음</a>
         <?php endif; ?>
     </div>
 <?php endif; ?>
