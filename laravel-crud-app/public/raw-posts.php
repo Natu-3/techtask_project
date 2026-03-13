@@ -197,7 +197,10 @@ try {
         <?php foreach ($posts as $post): ?>
             <tr>
                 <td><?= htmlspecialchars((string) $post['id'], ENT_QUOTES, 'UTF-8') ?></td>
-                <td><?= htmlspecialchars($post['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+                <td>
+                    <a href="/raw-post-show.php?id=<?= urlencode((string) $post['id']) ?>">
+                        <?= htmlspecialchars($post['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                    </a>
                 <td><?= htmlspecialchars($post['user_name'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($post['created_at'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
             </tr>
