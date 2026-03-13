@@ -16,11 +16,35 @@ class PostController extends Controller
     /**
      * Display a listing of the resource. 전체 리소스 보여줌?
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::with('user')->latest()    //get(); # user정보와 같이, 최신순으로, 가져온다
-        ->paginate(5);
-        return view('posts.index', compact('posts')); #posts 에 담아 posts.index 뷰로 전달한다
+        #리퀘스트 받은 json 값에서 검색된 키값, 명령어 등
+        $searchType = $request->input('search_type', 'all');
+        $keyword = trim($request->input('keyword', ''));
+
+        #post 및 추후 조인할 user 값들 미리 가져오겠다 선언
+        $query = Post::with('user')->latest();
+
+        if ($keyword !== '') {
+            if ($searchType === 'title') {
+                $query->where('title', 'like', '%' . $keyword . '%');
+            } elseif ($searchType === 'writer') {
+                $query->whereHas('user', function ($q) use ($keyword) {
+                    $q->where('name', 'like', '%' . $keyword . '%');
+                });
+            } else {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('title', 'like', '%' . $keyword . '%')
+                        ->orWhereHas('user', function ($userQuery) use ($keyword) {
+                            $userQuery->where('name', 'like', '%' . $keyword . '%');
+                        });
+                });
+            }
+        }
+
+        $posts = $query->paginate(5)->appends($request->query());
+
+        return view('posts.index', compact('posts', 'searchType', 'keyword'));
     }
 
     /**
