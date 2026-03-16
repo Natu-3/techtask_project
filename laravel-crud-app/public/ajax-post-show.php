@@ -76,7 +76,6 @@ writeLog('info', 'ajax-post-show.php started');
 <body>
 <div class="top-links">
     <a href="/posts">Main Menu</a>
-    <a href="/raw-post-show.php">레거시 상세</a>
     <a href="/ajax-posts.php">AJAX 목록</a>
 </div>
 

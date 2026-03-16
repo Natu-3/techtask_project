@@ -8,6 +8,7 @@ const paginationEl = document.getElementById('pagination');
 const logoutButton = document.getElementById('logoutButton');
 const loginButton = document.getElementById('loginButton');
 const authStatusEl = document.getElementById('authStatus');
+const createPostButton = document.getElementById('createPostButton');
 
 function setLoading(isLoading) {
     loadingEl.style.display = isLoading ? 'block' : 'none';
@@ -38,6 +39,10 @@ function updateAuthUi(isLoggedIn, user = null) {
 
     if (logoutButton) {
         logoutButton.disabled = !isLoggedIn;
+    }
+
+    if (createPostButton) {
+        createPostButton.disabled = !isLoggedIn;
     }
 
     if (authStatusEl) {
@@ -265,6 +270,11 @@ async function logout() {
     };
 }
 
+
+
+
+
+
 searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
     loadPosts(1);
@@ -294,6 +304,13 @@ if (logoutButton) {
         }
     });
 }
+
+if (createPostButton) {
+    createPostButton.addEventListener('click', () => {
+        window.location.href = '/ajax-post-create.php';
+    });
+}
+
 
 window.addEventListener('DOMContentLoaded', async () => {
     await loadAuthStatus();

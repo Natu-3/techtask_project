@@ -105,6 +105,7 @@ writeLog('info', 'ajax-posts.php started');
     <a href="/raw-posts.php">레거시 목록</a>
     <button type="button" id="loginButton">로그인</button>
     <button type="button" id="logoutButton">로그아웃</button>
+    <button type="button" id="createPostButton">글쓰기</button>
     <span id="authStatus">확인중.. </span>
 </div>
 
