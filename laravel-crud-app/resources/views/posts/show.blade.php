@@ -34,9 +34,7 @@
 
             <div class="mb-3">
                 <label class="form-label fw-bold">내용</label>
-                <div class="form-control bg-light" style="min-height: 180px; white-space: pre-wrap;">
-                    {{ $post->content }}
-                </div>
+                <div class="border rounded bg-light p-3" style="min-height: 180px; white-space: pre-wrap;">{{ $post->content }}</div>
             </div>
 
             @if ($post->images && $post->images->count())
