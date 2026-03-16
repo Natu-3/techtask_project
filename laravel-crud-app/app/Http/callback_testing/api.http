@@ -1,0 +1,11 @@
+### 로그인 테스트
+POST http://127.0.0.1:8000/api/login.php
+Content-Type: application/x-www-form-urlencoded
+
+email=id@test.com&password=password
+
+### 게시글 목록 테스트
+GET http://127.0.0.1:8000/api/posts/index.php
+
+### 게시글 상세 테스트
+GET http://127.0.0.1:8000/api/posts/show.php?id=14
