@@ -13,11 +13,11 @@ class User extends Authenticatable
         'password',
     ];
 
-    protected $hidden = [ # 모델에서 json 변환시 숨기는 칼럼
+    protected $hidden = [ // 모델에서 json 변환시 숨기는 칼럼
         'password',
     ];
 
-    public function posts(): HasMany # 1:N 관계 선언부? 반대측은 belongsTo
+    public function posts(): HasMany // 1:N 관계 선언부? 반대측은 belongsTo
     {
         return $this->hasMany(Post::class);
     }
