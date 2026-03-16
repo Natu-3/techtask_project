@@ -1,61 +1,134 @@
+<?php
+require_once __DIR__ . '/../app/support/logger.php';
+writeLog('info', 'ajax-posts.php started');
+?>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AJAX 게시판 조회</title>
+    <title>AJAX 게시글 목록</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 30px;
+            margin: 40px;
         }
 
         h1 {
             margin-bottom: 20px;
         }
 
+        .top-links {
+            margin-bottom: 16px;
+        }
+
+        .top-links a {
+            margin-right: 12px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-form input,
+        .search-form select,
+        .search-form button {
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+
         .message {
-            margin-bottom: 15px;
-            font-weight: bold;
+            margin-bottom: 16px;
+            color: #444;
         }
 
-        .message.success {
-            color: green;
+        .error {
+            color: #c00;
         }
 
-        .message.error {
-            color: red;
-        }
-
-        .post-item {
-            border: 1px solid #ddd;
-            padding: 12px;
-            margin-bottom: 12px;
-            max-width: 700px;
-        }
-
-        .post-item h3 {
-            margin: 0 0 8px;
-        }
-
-        .post-meta {
+        .loading {
             color: #666;
-            font-size: 13px;
-            margin-top: 8px;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        .empty {
+            color: #666;
+            padding: 20px 0;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination button,
+        .pagination strong {
+            margin-right: 8px;
+        }
+
+        .pagination button {
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .post-link {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .post-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-<h1>AJAX 게시판 조회</h1>
+<div class="top-links">
+    <a href="/posts">Main Menu</a>
+    <a href="/raw-posts.php">레거시 목록</a>
+</div>
 
-<div id="messageBox" class="message"></div>
+<h1>AJAX 게시글 목록</h1>
 
-<button type="button" id="reloadButton">새로 불러오기</button>
+<form id="searchForm" class="search-form">
+    <select name="search_type" id="searchType">
+        <option value="all">전체</option>
+        <option value="title">제목</option>
+        <option value="writer">작성자</option>
+    </select>
 
-<hr>
+    <input
+        type="text"
+        name="keyword"
+        id="keyword"
+        placeholder="검색어를 입력하세요"
+    >
 
-<div id="postList">불러오는 중...</div>
+    <button type="submit">검색</button>
+</form>
 
-<script src="storage/assets/js/ajax-posts.js"></script>
+<div id="loading" class="loading" style="display:none;">불러오는 중...</div>
+<div id="message" class="message"></div>
+<div id="tableContainer"></div>
+<div id="pagination" class="pagination"></div>
+
+<script src="/assets/js/ajax-posts.js"></script>
 </body>
 </html>
