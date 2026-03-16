@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/response.php';
-
 function startSessionIfNeeded(): void
 {
-    if (session_status() === PHP_SESSION_ACTIVE) {
+    if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 }
@@ -15,12 +13,21 @@ function loginUser(int $userId, string $userName): void
 {
     startSessionIfNeeded();
 
-    $_SESSION['userId'] = $userId;
+    $_SESSION['user_id'] = $userId;
     $_SESSION['user_name'] = $userName;
+
+    session_write_close();
 }
 
-function logoutUser(): void{
-    startSessionIfNeeded();
+function logoutUser(): void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return;
+    }
 
     $_SESSION = [];
 
@@ -31,38 +38,28 @@ function logoutUser(): void{
             session_name(),
             '',
             time() - 42000,
-            $params["path"],
-            $params["domain"],
-            $params["secure"],
-            $params["httponly"]
+            $params['path'],
+            $params['domain'],
+            $params['secure'],
+            $params['httponly']
         );
     }
 
     session_destroy();
 }
 
-
 function currentUserId(): ?int
 {
-    StartSessionIfNeeded();
+    startSessionIfNeeded();
 
-    if (!isset($_SESSION['userId'])) {
-        return null;
-    }
-
-    return (int) $_SESSION['userId'];
+    return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
 }
-
 
 function currentUserName(): ?string
 {
-    StartSessionIfNeeded();
+    startSessionIfNeeded();
 
-    if (!isset($_SESSION['user_name'])) {
-        return null;
-    }
-
-    return (string) $_SESSION['user_name'];
+    return isset($_SESSION['user_name']) ? (string) $_SESSION['user_name'] : null;
 }
 
 function isLoggedIn(): bool
@@ -74,11 +71,9 @@ function requireLogin(): int
 {
     $userId = currentUserId();
 
-    if ($userId === null){
-        jsonError('로그인이 필요합니다.',401);
+    if ($userId === null) {
+        jsonError('로그인이 필요합니다.', 401);
     }
 
     return $userId;
 }
-
-

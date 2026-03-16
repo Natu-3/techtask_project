@@ -1,6 +1,14 @@
 <?php
+require_once __DIR__ . '/../app/support/auth.php';
 require_once __DIR__ . '/../app/support/logger.php';
+
 writeLog('info', 'ajax-login.php started');
+
+if (isLoggedIn()) {
+    header('Location: /ajax-posts.php');
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ko">

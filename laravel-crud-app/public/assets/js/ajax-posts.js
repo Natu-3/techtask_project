@@ -5,8 +5,9 @@ const loadingEl = document.getElementById('loading');
 const messageEl = document.getElementById('message');
 const tableContainerEl = document.getElementById('tableContainer');
 const paginationEl = document.getElementById('pagination');
-
-let currentPage = 1;
+const logoutButton = document.getElementById('logoutButton');
+const loginButton = document.getElementById('loginButton');
+const authStatusEl = document.getElementById('authStatus');
 
 function setLoading(isLoading) {
     loadingEl.style.display = isLoading ? 'block' : 'none';
@@ -28,6 +29,70 @@ function escapeHtml(value) {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
+}
+
+function updateAuthUi(isLoggedIn, user = null) {
+    if (loginButton) {
+        loginButton.disabled = isLoggedIn;
+    }
+
+    if (logoutButton) {
+        logoutButton.disabled = !isLoggedIn;
+    }
+
+    if (authStatusEl) {
+        authStatusEl.textContent = isLoggedIn
+            ? (user?.name ? `${user.name}님 로그인됨` : '로그인됨')
+            : '비로그인 상태';
+    }
+}
+
+async function fetchMe() {
+    const response = await fetch('/api/me.php', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+        credentials: 'same-origin',
+    });
+
+    const rawText = await response.text();
+    console.log('me raw response:', rawText);
+
+    let result;
+
+    try {
+        result = JSON.parse(rawText);
+    } catch (error) {
+        throw new Error(`JSON 응답 파싱 실패: ${rawText}`);
+    }
+
+    return {
+        ok: response.ok,
+        status: response.status,
+        result,
+    };
+}
+
+async function loadAuthStatus() {
+    try {
+        const { ok, status, result } = await fetchMe();
+
+        if (ok && result.success === true) {
+            updateAuthUi(true, result.data.user);
+            return;
+        }
+
+        if (status === 401) {
+            updateAuthUi(false);
+            return;
+        }
+
+        updateAuthUi(false);
+    } catch (error) {
+        console.error(error);
+        updateAuthUi(false);
+    }
 }
 
 function renderTable(items) {
@@ -122,14 +187,12 @@ function renderPagination(pagination) {
 }
 
 async function loadPosts(page = 1) {
-    currentPage = page;
-
     const searchType = searchTypeEl.value;
     const keyword = keywordEl.value.trim();
 
     const params = new URLSearchParams({
         search_type: searchType,
-        keyword: keyword,
+        keyword,
         page: String(page),
     });
 
@@ -144,9 +207,19 @@ async function loadPosts(page = 1) {
             headers: {
                 'Accept': 'application/json',
             },
+            credentials: 'same-origin',
         });
 
-        const result = await response.json();
+        const rawText = await response.text();
+        console.log('posts raw response:', rawText);
+
+        let result;
+
+        try {
+            result = JSON.parse(rawText);
+        } catch (error) {
+            throw new Error(`JSON 응답 파싱 실패: ${rawText}`);
+        }
 
         if (!response.ok || result.success !== true) {
             throw new Error(result.message || '목록 조회에 실패했습니다.');
@@ -165,11 +238,64 @@ async function loadPosts(page = 1) {
     }
 }
 
+async function logout() {
+    const response = await fetch('/api/logout.php', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+        },
+        credentials: 'same-origin',
+    });
+
+    const rawText = await response.text();
+    console.log('logout raw response:', rawText);
+
+    let result;
+
+    try {
+        result = JSON.parse(rawText);
+    } catch (error) {
+        throw new Error(`JSON 응답 파싱 실패: ${rawText}`);
+    }
+
+    return {
+        ok: response.ok,
+        status: response.status,
+        result,
+    };
+}
+
 searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
     loadPosts(1);
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-    loadPosts(1);
+
+if (loginButton) {
+    loginButton.addEventListener('click', () => {
+        window.location.href = '/ajax-login.php';
+    });
+}
+
+if (logoutButton) {
+    logoutButton.addEventListener('click', async () => {
+        try {
+            const { ok, result } = await logout();
+
+            if (!ok || result.success !== true) {
+                throw new Error(result.message || '로그아웃에 실패했습니다.');
+            }
+
+            updateAuthUi(false);
+            window.location.href = '/ajax-login.php';
+        } catch (error) {
+            console.error(error);
+            alert(error.message || '로그아웃 중 오류가 발생했습니다.');
+        }
+    });
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadAuthStatus();
+    await loadPosts(1);
 });
