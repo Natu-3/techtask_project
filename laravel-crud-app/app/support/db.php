@@ -12,7 +12,7 @@ function getPdo(): PDO
         return $pdo;
     }
 
-    $dbPath = __DIR__ . '/../database/database.sqlite';
+    $dbPath = __DIR__ . '/../../database/database.sqlite';
 
     if (!file_exists($dbPath)) {
         throw new RuntimeException('SQLite 파일 연결에 실패했습니다.' . $dbPath);

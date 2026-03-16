@@ -13,7 +13,7 @@ function  jsonResponse(array $body, int $status = 200): void
     exit;
 }
 
-function jsonSuccess(String $message, $data = null, int $status = 200): void
+function jsonSuccess(string $message, $data = null, int $status = 200): void
 {
     $response = [
         'success' => true,
@@ -26,7 +26,7 @@ function jsonSuccess(String $message, $data = null, int $status = 200): void
     jsonResponse($response, $status);
 }
 
-function jsonError(String $message, int $status = 400, array $errors = []): void
+function jsonError(string $message, int $status = 400, array $errors = []): void
 {
     $response = [
         'success' => false,
@@ -38,4 +38,13 @@ function jsonError(String $message, int $status = 400, array $errors = []): void
     }
 
     jsonResponse($response, $status);
+}
+
+function requireMethod(string $method): void
+{
+    $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+    if (strtoupper($requestMethod) !== strtoupper($method)) {
+        jsonError('허용되지 않은 메서드입니다.', 405);
+    }
 }
