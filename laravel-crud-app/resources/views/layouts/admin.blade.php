@@ -69,23 +69,30 @@
             <nav class="mt-2">
                 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
                     <li class="nav-item">
-                        <a href="{{ route('posts.index') }}" class="nav-link {{ request()->routeIs('posts.index') ? 'active' : '' }}">
+                        <a href="{{ route('posts.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-list"></i>
-                            <p>게시글 목록</p>
+                            <p>Laravel 게시글 목록</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('posts.create') }}" class="nav-link {{ request()->routeIs('posts.create') ? 'active' : '' }}">
+                        <a href="{{ route('posts.create') }}" class="nav-link">
                             <i class="nav-icon fas fa-pen"></i>
-                            <p>게시글 작성</p>
+                            <p>Laravel 글 작성</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ url('/raw-posts.php') }}" class="nav-link">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>추가 메뉴 구현</p>
+                        <a href="{{ url('raw-posts.php') }}" class="nav-link">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            <p>PHP 게시글 조회</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ url('ajax-posts.php') }}" class="nav-link">
+                            <i class="nav-icon fas fa-bolt"></i>
+                            <p>AJAX 게시글 조회</p>
                         </a>
                     </li>
                 </ul>
