@@ -20,17 +20,18 @@ try {
     $pdo = getPdo();
 
     $sql = "
-        SELECT
-            posts.id,
-            posts.title,
-            posts.content,
-            posts.created_at,
-            users.name AS user_name
-        FROM posts
-        JOIN users ON posts.user_id = users.id
-        WHERE posts.id = :id
-        LIMIT 1
-    ";
+    SELECT
+        posts.id,
+        posts.title,
+        posts.content,
+        posts.user_id,
+        posts.created_at,
+        users.name AS user_name
+    FROM posts
+    JOIN users ON posts.user_id = users.id
+    WHERE posts.id = :id
+    LIMIT 1
+";
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $postId, PDO::PARAM_INT);
